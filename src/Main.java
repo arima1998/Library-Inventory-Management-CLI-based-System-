@@ -1,103 +1,95 @@
+import exceptions.DuplicateItemException;
+import exceptions.ItemDoesntExistException;
 import models.Book;
-import models.Magazine;
+import factories.libraryFactory;
+import service.Library;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args){
-        LibraryService libraryService = new LibraryService();
-        ///  populate the system
-        libraryService.populateService();
-
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int option;
+        Library library = Library.getInstance();
+        int options;
+
+        System.out.println("CLI BASED LIBRARY INVENTORY MANAGEMENT SYSTEM");
         do{
-            System.out.println();
-            System.out.println("Library Inventory System");
-            System.out.println("1. Add Item");
-            System.out.println("2. Remove Item");
-            System.out.println("3. Search Items by Title");
-            System.out.println("4. Calculate Late Fee");
-            System.out.println("5. List All Items");
-            System.out.println("6. Exit");
-            System.out.print("Enter your choice: ");
-            option = scanner.nextInt();
-            scanner.nextLine();
-
-
+            System.out.println("1: Add a Book");
+            System.out.println("2. Remove a Book");
+            System.out.println("3. Search for a Book");
+            System.out.println("4. Display All Books");
+            System.out.println("5. Exit");
+            System.out.println("Enter Option");
+            options = scanner.nextInt();
             try{
-                switch (option){
-                    case 1 -> add(scanner, libraryService);
-                    case 2 -> remove(scanner, libraryService);
-                    case 3 -> search(scanner, libraryService);
-                    case 4 -> calculateLateFee(scanner, libraryService);
-                    case 5 -> listAllItems(libraryService);
-                    case 6 -> System.out.println("Exiting system. Goodbye!");
-                    default -> System.out.println("Invalid choice. Try again.");
+                switch (options){
+                    case 1 -> addBook(scanner,library);
+                    case 2 -> removeBook(scanner, library);
+                    case 3 -> SearchBooksByIDorTitle(scanner, library);
+                    case 4 -> DisplayAllBooks(library);
+                    case 5 -> System.out.println("Exit!");
+                    default -> System.out.println("Invalid choice.");
                 }
-            }catch (Exception e){
-                System.out.println("Error "+ e.getMessage());
+            }
+            catch (DuplicateItemException | ItemDoesntExistException e){
+                System.out.println("Error: "+e.getMessage());
+            }
+            finally {
+                System.out.println("Instruction Executed");
             }
 
-        }while (option != 6);
-        scanner.close();
+        }while(options != 5);
+
 
     }
-
-    private static void add(Scanner scanner,LibraryService libraryService){
-        System.out.print("Enter item type (models.Book/models.Magazine): ");
-        String type = scanner.nextLine();
-        System.out.print("Enter Item ID: ");
+    private static void addBook(Scanner scanner,Library library){
+        System.out.print("Enter Book ID: ");
         int itemId = scanner.nextInt();
-        scanner.nextLine();
+        scanner.nextLine(); // Consume newline
         System.out.print("Enter Title: ");
         String title = scanner.nextLine();
         System.out.print("Enter Author: ");
         String author = scanner.nextLine();
-        System.out.print("Enter Year Published: ");
+        System.out.print("Enter Publication Year: ");
         int yearPublished = scanner.nextInt();
         scanner.nextLine();
-        if (type.equalsIgnoreCase("models.Book")) {
-            System.out.print("Enter Genre: ");
-            String genre = scanner.nextLine();
-            System.out.print("Enter ISBN: ");
-            String isbn = scanner.nextLine();
-            libraryService.addItem(new Book(itemId, title, author, yearPublished, genre, isbn));
-        } else if (type.equalsIgnoreCase("models.Magazine")) {
-            System.out.print("Enter Publisher: ");
-            String publisher = scanner.nextLine();
-            System.out.print("Enter Issue Number: ");
-            String issueNumber = scanner.nextLine();
-            libraryService.addItem(new Magazine(itemId, title, author, yearPublished, publisher, issueNumber));
-        } else {
-            System.out.println("Invalid item type.");
+        System.out.print("Enter Genre: ");
+        String genre = scanner.nextLine();
+
+        Book book = libraryFactory.createBook(itemId, title, author, yearPublished, genre);
+        library.AddBook(book);
+        System.out.println("Book added successfully: " + book);
+    }
+    private static void removeBook(Scanner scanner, Library library) {
+        scanner.nextLine();
+        System.out.print("Enter Book ID or Title to Remove: ");
+        String IdOrTitle = scanner.nextLine();
+        try{
+            library.RemoveBookByIdOrTitle(IdOrTitle);
+        }catch (RuntimeException e){
+            System.out.println("Caught RuntimeException: "+e.getMessage());
         }
     }
-    private static void listAllItems(LibraryService libraryService) {
-        libraryService.listAllItems().forEach(System.out::println);
-    }
-
-    private static void remove(Scanner scanner, LibraryService libraryService) {
-        System.out.print("Enter Item ID to Remove: ");
-        int itemId = scanner.nextInt();
-        libraryService.removeItem(itemId);
-        System.out.println("Item removed successfully!");
-    }
-
-    private static void search(Scanner scanner, LibraryService libraryService) {
-        System.out.print("Enter Title to Search: ");
+    private static void SearchBooksByIDorTitle(Scanner scanner, Library library) {
+        scanner.nextLine();
+        System.out.print("Enter Title or Blank: ");
         String title = scanner.nextLine();
-        libraryService.searchByTitle(title).forEach(System.out::println);
-    }
+        System.out.print("Enter Author or Blank: ");
+        String author = scanner.nextLine();
+        System.out.print("Enter Publication Year or Blank: ");
+        String yearInput = scanner.nextLine();
+        Integer year = yearInput.isEmpty() ? null : Integer.parseInt(yearInput);
 
-    private static void calculateLateFee(Scanner scanner, LibraryService libraryService) {
-        System.out.print("Enter Item ID: ");
-        int itemId = scanner.nextInt();
-        System.out.print("Enter Days Late: ");
-        int daysLate = scanner.nextInt();
-        double lateFee = libraryService.calculateLateFeeByItem(itemId, daysLate);
-        System.out.println("Late Fee: $" + lateFee);
+        List<Book> books = library.SearchBooksByCriteria(title.isEmpty()?null:title, author.isEmpty()?null:author, year);
+        if(books.isEmpty()){
+            System.out.println("No Books Found");
+        }
+        else books.forEach(System.out::println);
+    }
+    private static void DisplayAllBooks(Library library) {
+        library.ShowAllBooksSortedByYearDesc().forEach(System.out::println);
     }
 
 }
