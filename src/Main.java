@@ -1,3 +1,6 @@
+import models.Book;
+import models.Magazine;
+
 import java.util.Scanner;
 
 public class Main {
@@ -43,7 +46,7 @@ public class Main {
     }
 
     private static void add(Scanner scanner,LibraryService libraryService){
-        System.out.print("Enter item type (Book/Magazine): ");
+        System.out.print("Enter item type (models.Book/models.Magazine): ");
         String type = scanner.nextLine();
         System.out.print("Enter Item ID: ");
         int itemId = scanner.nextInt();
@@ -55,13 +58,13 @@ public class Main {
         System.out.print("Enter Year Published: ");
         int yearPublished = scanner.nextInt();
         scanner.nextLine();
-        if (type.equalsIgnoreCase("Book")) {
+        if (type.equalsIgnoreCase("models.Book")) {
             System.out.print("Enter Genre: ");
             String genre = scanner.nextLine();
             System.out.print("Enter ISBN: ");
             String isbn = scanner.nextLine();
             libraryService.addItem(new Book(itemId, title, author, yearPublished, genre, isbn));
-        } else if (type.equalsIgnoreCase("Magazine")) {
+        } else if (type.equalsIgnoreCase("models.Magazine")) {
             System.out.print("Enter Publisher: ");
             String publisher = scanner.nextLine();
             System.out.print("Enter Issue Number: ");

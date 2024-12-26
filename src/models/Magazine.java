@@ -1,4 +1,6 @@
-public class Magazine extends LibraryItem{
+package models;
+
+public class Magazine extends LibraryItem {
     private String publisher;
     private String ISSN;
 

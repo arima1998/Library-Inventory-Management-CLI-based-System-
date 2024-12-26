@@ -1,5 +1,6 @@
+package models;
 
-public class Book extends LibraryItem{
+public class Book extends LibraryItem {
     private String ISBN;
     private String genre;
 
