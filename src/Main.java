@@ -47,7 +47,7 @@ public class Main {
     private static void AddBook(Scanner scanner, Library library){
         System.out.print("Enter Book ID: ");
         int itemId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
         System.out.print("Enter Title: ");
         String title = scanner.nextLine();
         System.out.print("Enter Author: ");
