@@ -25,8 +25,8 @@ public class Main {
             options = scanner.nextInt();
             try{
                 switch (options){
-                    case 1 -> addBook(scanner,library);
-                    case 2 -> removeBook(scanner, library);
+                    case 1 -> AddBook(scanner,library);
+                    case 2 -> RemoveBook(scanner, library);
                     case 3 -> SearchBooksByIDorTitle(scanner, library);
                     case 4 -> DisplayAllBooks(library);
                     case 5 -> System.out.println("Exit!");
@@ -44,7 +44,7 @@ public class Main {
 
 
     }
-    private static void addBook(Scanner scanner,Library library){
+    private static void AddBook(Scanner scanner, Library library){
         System.out.print("Enter Book ID: ");
         int itemId = scanner.nextInt();
         scanner.nextLine(); // Consume newline
@@ -62,7 +62,7 @@ public class Main {
         library.AddBook(book);
         System.out.println("Book added successfully: " + book);
     }
-    private static void removeBook(Scanner scanner, Library library) {
+    private static void RemoveBook(Scanner scanner, Library library) {
         scanner.nextLine();
         System.out.print("Enter Book ID or Title to Remove: ");
         String IdOrTitle = scanner.nextLine();
